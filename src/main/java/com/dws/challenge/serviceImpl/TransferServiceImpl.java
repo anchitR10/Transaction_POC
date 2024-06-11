@@ -31,9 +31,12 @@ public class TransferServiceImpl implements TransferService {
         Account accountFrom = accountService.getAccount(transferRequest.getAccountFrom());
         Account accountTo = accountService.getAccount(transferRequest.getAccountTo());
 
-        
-    	synchronized (accountFrom) {
-            synchronized (accountTo) {
+       // checking lock acquisition order
+        Account firstAcnt = accountFrom.getAccountId().compareTo(accountTo.getAccountId()) < 0 ? accountFrom : accountTo;
+        Account scndAcnt = firstAcnt == accountFrom ? accountTo : accountFrom;
+
+    	synchronized (firstAcnt) {
+            synchronized (scndAcnt) {
                 
     	
     	// Validate request body
